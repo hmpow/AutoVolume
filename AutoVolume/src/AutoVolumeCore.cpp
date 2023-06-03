@@ -191,7 +191,7 @@ namespace autoVolCore {
         pEndpointVol->GetMasterVolumeLevel(&currentATT);
 
         // 出力レベルを計算 
-        predictOutputDB = beforeATTLevelPeakH + currentATT;
+        // predictOutputDB = beforeATTLevelPeakH + currentATT;
 
         // 単純に今のATT前音量に対してどれだけATTすせば目標値になるかをATT手前だけを見て反映する 
         // SetMasterVolumeLevel = 目標値 - GetPeakValue すればよい 
