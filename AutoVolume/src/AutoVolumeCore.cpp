@@ -43,7 +43,7 @@ namespace autoVolCore {
     float avr_diff_val_db     = 0.0f; // 差分の移動平均 
     bool  isRestartedFlag     = false;
     BOOL  endVol_isMute       = FALSE; //ミュート状態
-
+    HWND hWnd                 = NULL;  //親ウィンドウ
 
     //初期化 リソースを取得
     void init_autoVol() {
@@ -112,6 +112,12 @@ namespace autoVolCore {
         return;
     }
 
+    //親ウィンドウ指定
+    void set_hWnd(HWND _hWnd) {
+        hWnd = _hWnd;
+        return;
+    }
+
     //終了 リソースを開放
     void release_autoVol() {
         isCanRun = false;
@@ -148,6 +154,11 @@ namespace autoVolCore {
         return;
     }
 
+    //ウィンドウ消去コールバック
+
+
+
+
     // 音量調整処理　ループまたは繰り返しタイマーで呼ばれる
     void drive_autoVol() {
         
@@ -159,9 +170,9 @@ namespace autoVolCore {
         //デフォルトオーディオデバイスが変わっていたら再起動
         if(mNotificationClient.get_isDefaultDeviceChanged()){
             mNotificationClient.clear_isDefaultDeviceChanged();
-            MessageBox(NULL, 
+            /* MessageBox(hWnd,
                 TEXT("デフォルト出力デバイスが変更されました\nAutoVolumeを再スタートします"), 
-                TEXT("AutoVolume"), MB_ICONINFORMATION | MB_TASKMODAL);
+                TEXT("AutoVolume"), MB_ICONINFORMATION | MB_TASKMODAL); */
             restart_autoVol();
             return; //実行されないはず
         }

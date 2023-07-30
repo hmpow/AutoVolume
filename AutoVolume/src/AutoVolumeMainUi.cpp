@@ -229,6 +229,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (isRun) { //自動調整開始
                 isFirstStart = false;
                 autoVolCore::init_autoVol(); //初期化
+                autoVolCore::set_hWnd(hWnd); //ウィンドウ情報設定
                 //目標値をメモリから設定
                 autoVolCore::ctrl::set_targetLevel_by_0_100(gParamMap.at("targetSliderVal"));
                 wsprintf(volmsg, _T("%3ddB"), (int)autoVolCore::ctrl::get_taget_lev_db());
