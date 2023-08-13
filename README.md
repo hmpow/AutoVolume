@@ -40,3 +40,8 @@ The MIT license does not apply to the quoted code, so please check Microsoft's t
 引用コードにMITライセンスは適用されませんので、使用にあたりましてはMicrosoftの利用規約を確認ください。  
   
 https://learn.microsoft.com/ja-jp/windows/apps/
+
+# 詳細 はQiitaをご覧ください
+
+快適Web会議！ Windows コアオーディオAPIで自動音量調整
+https://qiita.com/hmpow/items/f54483ead5da0e5e6893
