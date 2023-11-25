@@ -7,6 +7,9 @@ Win32 コアオーディオAPIを用いて自動音量調整をするアプリ�
 Web会議、投稿オンライン動画視聴、ライブ配信試聴に適しています。  
 EndpointVolume API を用いて、リアルタイムの音声出力レベルを検出し、マスターボリュームを制御します。
 
+<img width="277" alt="image" src="https://github.com/hmpow/AutoVolume/assets/67511807/7ebed174-0d6d-4de0-928a-792404b67626">
+
+
 # Japanese Only
 I can not speak English; therefore, comments and UI texts are available in Japanese only.  
 If I write comments in English, I can no longer read my own code...
@@ -37,3 +40,8 @@ The MIT license does not apply to the quoted code, so please check Microsoft's t
 引用コードにMITライセンスは適用されませんので、使用にあたりましてはMicrosoftの利用規約を確認ください。  
   
 https://learn.microsoft.com/ja-jp/windows/apps/
+
+# 詳細 はQiitaをご覧ください
+
+快適Web会議！ Windows コアオーディオAPIで自動音量調整
+https://qiita.com/hmpow/items/f54483ead5da0e5e6893
