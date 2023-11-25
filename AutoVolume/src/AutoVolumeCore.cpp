@@ -48,6 +48,8 @@ namespace autoVolCore {
     //初期化 リソースを取得
     void init_autoVol() {
 
+        static short errCnt = 0;
+
         //メンバ変数初期化
         ctrl::set_ReleaseRate(peakH_decPerSec);
 
@@ -71,10 +73,24 @@ namespace autoVolCore {
         //ToDo：TARGET_ROLE(eConsole,eCommunication,eMultimedia)選択に対応
         hr = pEnumerator->GetDefaultAudioEndpoint(eRender, TARGET_ROLE, &pDevice);
         if (hr == E_NOTFOUND) {
-            MessageBox(NULL,
-                TEXT("有効な出力デバイスが見つかりません"),
-                TEXT("AutoVolume エラー"),
-                MB_ICONERROR);
+            // 内蔵SPないデバイスでイヤホン抜けた時の強制終了回避を追加
+            if(errCnt < 3){
+                errCnt++;
+                MessageBox(NULL,
+                    TEXT("有効な出力デバイスが見つかりません\nイヤホンまたはスピーカを接続してください"),
+                    TEXT("AutoVolume エラー"),
+                    MB_ICONERROR);
+                restart_autoVol();
+            }
+            else {
+                MessageBox(NULL,
+                    TEXT("エラーカウンタが3回になりました\n強制終了します"),
+                    TEXT("AutoVolume エラー"),
+                    MB_ICONERROR);
+            }
+        }
+        else {
+            errCnt = 0;
         }
         error_chk(hr);
 

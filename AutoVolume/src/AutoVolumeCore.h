@@ -25,6 +25,7 @@ namespace autoVolCore {
     void set_hWnd(HWND);
     void drive_autoVol(void);
     void release_autoVol(void);
+    void restart_autoVol(void);
     void error_chk(HRESULT);
 
     //リソースをヌルチェックしてリリース 型不問
