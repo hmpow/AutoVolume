@@ -46,6 +46,7 @@ namespace autoVolCore {
         unsigned int get_ReleaseRate(void);         //リリース速度 dB/s の取得
         void         set_ReleaseRate(unsigned int); //リリース速度 dB/s の設定
         bool         isRestarted(void);             //リスタートされたか
+        bool         isErrorStop(void);             //異常終了するか
     }
 
     //事前処理系

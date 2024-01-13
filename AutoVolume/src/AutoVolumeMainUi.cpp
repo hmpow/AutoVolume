@@ -70,7 +70,18 @@ int WINAPI wWinMain(
     //ウィンドウの生成
     if (!InitInstance(hCurrInstance, nCmdShow))
     {
+        showStartupErrMsg();
+        return 1;
+    }
 
+    //音量ボタンをホットキー登録
+    if (!RegisterHotKey(
+        NULL, //現在のスレッド
+        1,
+        MOD_ALT,
+        VK_VOLUME_DOWN | VK_VOLUME_UP
+    )) {
+        showStartupErrMsg();
         return 1;
     }
 
@@ -156,6 +167,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     //毎回白紙撤回されてしまう
     PAINTSTRUCT ps;
     HDC hdc;
+    wchar_t debugmsg[32] = { 0 };
     static TCHAR stmsg[32] = { 0 };
     static TCHAR volmsg[8] = { 0 };
     static TCHAR volLabel[8] = { 0 };
@@ -228,7 +240,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             isRun = !isRun;
             if (isRun) { //自動調整開始
                 isFirstStart = false;
+
                 autoVolCore::init_autoVol(); //初期化
+
+                //有効なオーディオデバイス未接続で開始した
+                if (autoVolCore::ctrl::isErrorStop()) {
+                    isRun = false;
+                    autoVolCore::release_autoVol();
+                    return 0;
+                }
                 autoVolCore::set_hWnd(hWnd); //ウィンドウ情報設定
                 //目標値をメモリから設定
                 autoVolCore::ctrl::set_targetLevel_by_0_100(gParamMap.at("targetSliderVal"));
@@ -242,6 +262,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             else {
                 //停止する
+
                 //タイマー停止
                 KillTimer(hWnd, AUTOVOL_TIMER);
                 //リリース
@@ -273,7 +294,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (wParam != AUTOVOL_TIMER) {
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
+
         autoVolCore::drive_autoVol();
+
+        //実行中かつエラーなら停止
+        if (isRun && autoVolCore::ctrl::isErrorStop()) {
+            //通常終了とコピペなのでスコープ考える気になったら関数にする
+            //停止する
+            //タイマー停止
+            KillTimer(hWnd, AUTOVOL_TIMER);
+            //リリース
+            autoVolCore::release_autoVol();
+            //UI更新
+            wsprintf(volmsg, _T("---dB"));
+            wsprintf(stmsg, _T("停止中"));
+            isRun = false;
+            InvalidateRect(hWnd, NULL, TRUE); //UI Update 全体
+        }
+
         //実行中かつリスタートしていたらUI更新
         //isRestarted()は一度呼ぶと自動でフラグクリアする
         if (isRun && autoVolCore::ctrl::isRestarted()) {
@@ -334,6 +372,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_CLOSE:
+        //音量ボタンホットキー解除
+        UnregisterHotKey(NULL, 1);
         //自動調整停止
         if (isRun) {
             KillTimer(hWnd, AUTOVOL_TIMER);

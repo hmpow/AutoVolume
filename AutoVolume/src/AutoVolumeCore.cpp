@@ -42,6 +42,7 @@ namespace autoVolCore {
     float nextATT             = 0.0f; // 次にセットするATT量 
     float avr_diff_val_db     = 0.0f; // 差分の移動平均 
     bool  isRestartedFlag     = false;
+    bool  isErrorStopFlag     = false;
     BOOL  endVol_isMute       = FALSE; //ミュート状態
     HWND hWnd                 = NULL;  //親ウィンドウ
 
@@ -76,17 +77,20 @@ namespace autoVolCore {
             // 内蔵SPないデバイスでイヤホン抜けた時の強制終了回避を追加
             if(errCnt < 3){
                 errCnt++;
+                isErrorStopFlag = true;
+
                 MessageBox(NULL,
                     TEXT("有効な出力デバイスが見つかりません\nイヤホンまたはスピーカを接続してください"),
                     TEXT("AutoVolume エラー"),
                     MB_ICONERROR);
-                restart_autoVol();
+
+                return;
             }
             else {
                 MessageBox(NULL,
                     TEXT("エラーカウンタが3回になりました\n強制終了します"),
                     TEXT("AutoVolume エラー"),
-                    MB_ICONERROR);
+                    MB_ICONERROR);       
             }
         }
         else {
@@ -153,8 +157,11 @@ namespace autoVolCore {
         isCanRun = false; //運転準備「切」　※UI側の定期タイマーは動き続けるため
         release_autoVol();
         init_autoVol();
-        isCanRun = true;  //運転準備「入」
-        isRestartedFlag = true; //UI更新用フラグ
+        if (!isErrorStopFlag) {
+            isCanRun = true;  //運転準備「入」
+            isRestartedFlag = true; //UI更新用フラグ
+        }
+        return;
     }
 
 
@@ -338,6 +345,13 @@ namespace autoVolCore {
             bool isRFlag = isRestartedFlag;
             isRestartedFlag = false;
             return isRFlag;
+        }
+
+        //リスタートしたか取得・リセット
+        bool isErrorStop(void) {
+            bool isESFlag = isErrorStopFlag;
+            isErrorStopFlag = false;
+            return isESFlag;
         }
     }
 
