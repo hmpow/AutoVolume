@@ -1,4 +1,5 @@
-﻿#include "../res/resource.h "
+﻿
+#include "../res/resource.h "
 #include "AutoVolumeCore.h"
 #include "InitFileCtrl.h"
 #include <string>
@@ -29,6 +30,15 @@ static TCHAR szWindowClass[] = _T("AutoVolume");
 // アプリケーションのタイトル バーに表示される文字列
 static TCHAR szTitle[] = _T("AutoVolume");
 
+void debugmsg(LPCWSTR word) {
+    MessageBox(NULL,
+        word,
+        _T("AutoVolume エラー"),
+        MB_ICONERROR);
+}
+
+//最適化無効化しないとリリースビルド時InitInstanceでエラーになる
+#pragma optimize("", off)
 int WINAPI wWinMain(
     _In_ HINSTANCE     hCurrInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -45,10 +55,12 @@ int WINAPI wWinMain(
     );
     if (ghMutex == NULL)
     {
+        debugmsg(_T("mutexがNULL"));
         showStartupErrMsg();
         return 1;
     }
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
+        debugmsg(_T("mutexでエラーあり"));
         showStartupErrMsg();
         return 1;
     }
@@ -64,6 +76,7 @@ int WINAPI wWinMain(
     if (!InitApp(hCurrInstance))
     {
         showStartupErrMsg();
+        debugmsg(_T("ウインドウクラスの登録"));
         return 1;
     }
 
@@ -71,6 +84,7 @@ int WINAPI wWinMain(
     if (!InitInstance(hCurrInstance, nCmdShow))
     {
         showStartupErrMsg();
+        debugmsg(_T("ウィンドウの生成"));
         return 1;
     }
 
@@ -82,6 +96,7 @@ int WINAPI wWinMain(
         VK_VOLUME_DOWN | VK_VOLUME_UP
     )) {
         showStartupErrMsg();
+        debugmsg(_T("音量ボタンをホットキー登録"));
         return 1;
     }
 
@@ -99,7 +114,7 @@ int WINAPI wWinMain(
 
     return (int)msg.wParam;
 }
-
+#pragma optimize("", on)
 
 //ウインドウクラスの登録
 ATOM InitApp(HINSTANCE hInstance) {
