@@ -31,10 +31,12 @@ static TCHAR szWindowClass[] = _T("AutoVolume");
 static TCHAR szTitle[] = _T("AutoVolume");
 
 void debugmsg(LPCWSTR word) {
+    /*
     MessageBox(NULL,
         word,
         _T("AutoVolume エラー"),
         MB_ICONERROR);
+    */
 }
 
 //最適化無効化しないとリリースビルド時InitInstanceでエラーになる
