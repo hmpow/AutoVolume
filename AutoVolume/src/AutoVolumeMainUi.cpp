@@ -163,7 +163,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
     //ウィンドウ作成が成功していればウィンドウハンドルが返される
     if (!hWnd) {
-        return false;
+        return false; //失敗
     }
 
     // ShowWindow で表示
@@ -174,6 +174,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
     //ウィンドウを更新
     UpdateWindow(hWnd);
+
+    return true; //失敗
 }
 
 
@@ -237,6 +239,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         //リリースレートをメモリから設定
         autoVolCore::ctrl::set_ReleaseRate(gParamMap.at("releaseSliderVal"));
+        //停止閾値をメモリから設定
+        autoVolCore::ctrl::set_StopTh((float)gParamMap.at("stopThSliderVal"));
+        
 
         break;
     case WM_HSCROLL: //トラックバーがスクロールされたら
@@ -298,7 +303,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case IDM_HELP: //メニュー_ヘルプ
             MessageBox(NULL,
-                _T("詳細はオンラインヘルプを参照ください\nhttps://www.hogehoge.jp"),
+                _T("詳細はgitを参照ください\nhttps://github.com/hmpow/AutoVolume"),
                 _T("HELP"),
                 MB_OK);
             break;
@@ -422,35 +427,76 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 BOOL CALLBACK MyDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
     static int releaserate = 0;
-    static HWND hRatetrcbar;
+    static HWND hRateTrcbar;
     static HWND hRateText;
     static TCHAR rateLabel[8] = { 0 };
 
+    static int stopTh = 0;
+    static HWND hStopThTrcbar;
+    static HWND hStopThText;
+    static TCHAR StopThLabel[8] = { 0 };
+
     switch (msg) {
     case WM_INITDIALOG: //ダイアログボックス表示時
-        hRatetrcbar = GetDlgItem(hDlg, ID_RELEASE_TRACKBAR);  //トラックバー取得
+
+        //ToDo トラックバーをクラスにしてコピペをやめる
+
+        //リリースレート
+        hRateTrcbar = GetDlgItem(hDlg, ID_RELEASE_TRACKBAR);  //トラックバー取得
         hRateText = GetDlgItem(hDlg, ID_RELASE_VALUE);        //dB/sテキスト取得
         releaserate = autoVolCore::ctrl::get_ReleaseRate();
 
 
-        SendMessage(hRatetrcbar, TBM_SETRANGE, TRUE, MAKELPARAM(1, MAX_P_HOLD_DECR_DB_PER_SEC)); // レンジを指定
-        SendMessage(hRatetrcbar, TBM_SETTICFREQ, 10, 0);          // 目盛りの増分
-        SendMessage(hRatetrcbar, TBM_SETPOS, TRUE, releaserate);  // 位置の設定
-        SendMessage(hRatetrcbar, TBM_SETPAGESIZE, 0, 5);          // クリック時の移動量
+        SendMessage(hRateTrcbar, TBM_SETRANGE, TRUE, MAKELPARAM(1, MAX_P_HOLD_DECR_DB_PER_SEC)); // レンジを指定
+        SendMessage(hRateTrcbar, TBM_SETTICFREQ, 10, 0);          // 目盛りの増分
+        SendMessage(hRateTrcbar, TBM_SETPOS, TRUE, releaserate);  // 位置の設定
+        SendMessage(hRateTrcbar, TBM_SETPAGESIZE, 0, 5);          // クリック時の移動量
         wsprintf(rateLabel, _T("%3ddB/s"), releaserate);
         SetWindowText(hRateText, rateLabel);
+
+        //停止閾値
+        hStopThTrcbar = GetDlgItem(hDlg, ID_DEFAULT_STOP_TH_DB_TRACKBAR);  //トラックバー取得
+        hStopThText = GetDlgItem(hDlg, ID_DEFAULT_STOP_TH_DB_VALUE);        //dB/sテキスト取得
+        stopTh = (int)autoVolCore::ctrl::get_StopTh();
+
+
+        SendMessage(hStopThTrcbar, TBM_SETRANGE, TRUE, MAKELPARAM(-100, -20)); // レンジを指定
+        SendMessage(hStopThTrcbar, TBM_SETTICFREQ, 10, 0);          // 目盛りの増分
+        SendMessage(hStopThTrcbar, TBM_SETPOS, TRUE, stopTh);  // 位置の設定
+        SendMessage(hStopThTrcbar, TBM_SETPAGESIZE, 0, 5);          // クリック時の移動量
+        wsprintf(StopThLabel, _T("%3ddB"), stopTh);
+        SetWindowText(hStopThText, StopThLabel);
+
         break;
 
     case WM_HSCROLL:
-        releaserate = (int)SendMessage(hRatetrcbar, TBM_GETPOS, 0, 0);
-        wsprintf(rateLabel, _T("%3ddB/s"), releaserate);
-        SetWindowText(hRateText, rateLabel);
-        break;
+    {
+
+        HWND hTrackbar = (HWND)lp;  // ここで lParam からトラックバーのハンドルを取得
+
+        switch (GetDlgCtrlID(hTrackbar)) {
+        case ID_RELEASE_TRACKBAR:
+            releaserate = (int)SendMessage(hRateTrcbar, TBM_GETPOS, 0, 0);
+            wsprintf(rateLabel, _T("%3ddB/s"), releaserate);
+            SetWindowText(hRateText, rateLabel);
+            break;
+        case ID_DEFAULT_STOP_TH_DB_TRACKBAR:
+            stopTh = (int)SendMessage(hStopThTrcbar, TBM_GETPOS, 0, 0);
+            wsprintf(StopThLabel, _T("%3ddB"), stopTh);
+            SetWindowText(hStopThText, StopThLabel);
+            break;
+        default:
+            //何もしない
+            break;
+        }
+    }
     case WM_COMMAND:
         switch (LOWORD(wp)) {
         case IDOK:
             gParamMap["releaseSliderVal"] = releaserate;     //メモリに書き込み
+            gParamMap["stopThSliderVal"] = stopTh;           //メモリに書き込み
             autoVolCore::ctrl::set_ReleaseRate(releaserate); //反映
+            autoVolCore::ctrl::set_StopTh((float)stopTh);    //反映
             EndDialog(hDlg, IDOK);                           //ダイアログを破棄
             return TRUE;
         case IDCANCEL:
@@ -462,18 +508,19 @@ BOOL CALLBACK MyDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
     return FALSE;
 }
 
-//目標値をメモリからファイルに保存
+//設定値をローカル設定情報MAPから外部ファイルに保存
 void saveParamToFile(void) {
     initFileCtrl::mapToFile(gParamMap);
     return;
 }
 
-//設定ファイルマップ初期化
+//ローカル設定情報MAP初期化
 void initParamMap(void) {
-    //MAP初期化
-    gParamMap.insert(std::make_pair("targetSliderVal", DEFAULT_TARGET_SLIDER_POS));
+    //ローカル設定情報MAP初期化
+    gParamMap.insert(std::make_pair("targetSliderVal" , DEFAULT_TARGET_SLIDER_POS));
     gParamMap.insert(std::make_pair("releaseSliderVal", DEFAULT_P_HOLD_DECR_DB_PER_SEC));
-    //ファイルから読み込んでアップデート(ファイルが無ければデフォルトのまま)
+    gParamMap.insert(std::make_pair("stopThSliderVal" , DEFAULT_STOP_TH_DB));
+    //外部ファイルから読み込んでローカル設定情報MAP更新(外部ファイルが無ければデフォルトのまま)
     initFileCtrl::updateMapFromFile(&gParamMap);
     return;
 }

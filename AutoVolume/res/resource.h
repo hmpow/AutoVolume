@@ -20,7 +20,9 @@
 
 //DIALOG
 #define ID_RELEASE_TRACKBAR				500
-#define ID_RELASE_VALUE					503
+#define ID_DEFAULT_STOP_TH_DB_TRACKBAR  501
+#define ID_RELASE_VALUE					550
+#define ID_DEFAULT_STOP_TH_DB_VALUE     551
 
 // Next default values for new objects
 // 

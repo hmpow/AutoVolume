@@ -47,6 +47,8 @@ namespace autoVolCore {
         void         set_ReleaseRate(unsigned int); //リリース速度 dB/s の設定
         bool         isRestarted(void);             //リスタートされたか
         bool         isErrorStop(void);             //異常終了するか
+        float        get_StopTh(void);              //停止閾値を取得
+        void         set_StopTh(float);             //停止閾値を設定 
     }
 
     //事前処理系

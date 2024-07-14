@@ -14,9 +14,8 @@
 #define DEFAULT_TARGET_SLIDER_POS 50
 #define MAX_P_HOLD_DECR_DB_PER_SEC 100 // スライダ-で選べる最大値 
 
-// 音量設定 
-#define STOP_TH_DIFF_DB 20.0f  // 無音と判定するピークメータdB値 ※TH = targetVal - STOP_TH_DB  
-#define STOP_TH_DB -60.0f
+// 音量設定
+#define DEFAULT_STOP_TH_DB -60.0f  // 無音と判定するピークメータdB値
 #define TARGET_DB  -26.0f // 目標とする出力レベルデフォルト値 
 
 // 閾値最小値 

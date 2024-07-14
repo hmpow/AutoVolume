@@ -1,3 +1,4 @@
-releaseSliderVal 30
-targetSliderVal 79
+releaseSliderVal 100
+stopThSliderVal -20
+targetSliderVal 100
 

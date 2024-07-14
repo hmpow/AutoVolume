@@ -10,7 +10,7 @@ namespace autoVolCore {
 
     // 動作パラメータ設定 ※名前空間内グローバル変数的動作なので関数から操作可能
     float        targetLeveldB   = (float)TARGET_DB;  // 目標とする出力レベル
-    float        stopTh_dB       = STOP_TH_DB;        // 無音と判定するピークメータdB値 
+    float        stopTh_dB       = DEFAULT_STOP_TH_DB;        // 無音と判定するピークメータdB値 
     unsigned int peakH_decPerSec = DEFAULT_P_HOLD_DECR_DB_PER_SEC;
     float        p_hold_dec      = 0.0f;
 
@@ -337,6 +337,18 @@ namespace autoVolCore {
                 peakH_decPerSec = rate_per_sec;
                 //ピークホールドの1サイクル復帰量
                 p_hold_dec = ((float)AUTOVOL_PERIOD_MS) * ((float)peakH_decPerSec / 1000.0f);
+            }
+        }
+
+        //停止閾値 dB の取得
+        float get_StopTh(void) {
+            return stopTh_dB;
+        }
+
+        //停止閾値 dB の設定
+        void set_StopTh(float thVal) {
+            if (thVal < 0.0) {
+                stopTh_dB = thVal;
             }
         }
 
