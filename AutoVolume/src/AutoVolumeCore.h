@@ -48,7 +48,8 @@ namespace autoVolCore {
         bool         isRestarted(void);             //リスタートされたか
         bool         isErrorStop(void);             //異常終了するか
         float        get_StopTh(void);              //停止閾値を取得
-        void         set_StopTh(float);             //停止閾値を設定 
+        void         set_StopTh(float);             //停止閾値を設定
+        void         rimit_StopTh(void);            //停止閾値が目標音量を超えないよう制限
     }
 
     //事前処理系

@@ -127,6 +127,9 @@ namespace autoVolCore {
         hr = pEnumerator->RegisterEndpointNotificationCallback(&mNotificationClient);
         error_chk(hr);
 
+        //停止閾値リミッター確認
+        ctrl::rimit_StopTh();
+
         //運転準備「入」
         isCanRun = true;
         return;
@@ -287,6 +290,8 @@ namespace autoVolCore {
                 //問題なければそのまま設定
                 targetLeveldB = level_db;
             }
+            //停止閾値リミッター
+            rimit_StopTh();
             return;
         }
 
@@ -348,10 +353,16 @@ namespace autoVolCore {
         //停止閾値 dB の設定
         void set_StopTh(float thVal) {
             //目標音量と逆転していたら制限
-            if (thVal < targetLeveldB) {
+            if (thVal < 0) {
                 stopTh_dB = thVal;
+                rimit_StopTh();
             }
-            else {
+        }
+
+        //停止閾値 dB の制限
+        void rimit_StopTh(void) {
+            //目標音量と逆転していたら制限
+            if (targetLeveldB < stopTh_dB) {
                 stopTh_dB = targetLeveldB;
             }
         }
