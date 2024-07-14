@@ -347,8 +347,12 @@ namespace autoVolCore {
 
         //停止閾値 dB の設定
         void set_StopTh(float thVal) {
-            if (thVal < 0.0) {
+            //目標音量と逆転していたら制限
+            if (thVal < targetLeveldB) {
                 stopTh_dB = thVal;
+            }
+            else {
+                stopTh_dB = targetLeveldB;
             }
         }
 
