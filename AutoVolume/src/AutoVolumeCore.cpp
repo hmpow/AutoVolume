@@ -1,5 +1,7 @@
 ﻿#include "AutoVolumeCore.h"
 
+#define STOP_P_HOLD_DEC 0.0f
+
 //クラス代用namespace
 //Todo 素直にクラスにする
 namespace autoVolCore {
@@ -217,12 +219,20 @@ namespace autoVolCore {
         beforeATTLevelRealT = preTrt::to_dB(beforeATTLevelRealT);
 
         // 無音時動作停止
+        /*
         if (beforeATTLevelRealT < stopTh_dB) {
             return;
         }
+        */
 
         // ATT前の音量をピークホールド処理
-        beforeATTLevelPeakH = preTrt::pk_Hold(beforeATTLevelRealT, pflVolumeMindB, p_hold_dec);
+        if (beforeATTLevelRealT < stopTh_dB) {
+            //入力音量が小さいときはピークホールド復帰動作（音量上昇）をしない
+            beforeATTLevelPeakH = preTrt::pk_Hold(beforeATTLevelRealT, pflVolumeMindB, STOP_P_HOLD_DEC);
+        }
+        else {
+            beforeATTLevelPeakH = preTrt::pk_Hold(beforeATTLevelRealT, pflVolumeMindB, p_hold_dec);
+        }
 
         // 現在のATT設定を取得 
         pEndpointVol->GetMasterVolumeLevel(&currentATT);
@@ -362,9 +372,12 @@ namespace autoVolCore {
         //停止閾値 dB の制限
         void rimit_StopTh(void) {
             //目標音量と逆転していたら制限
+            //ピークホールドリリース一時停止式への切り替えに伴い不要　ただし逆転時はヒステリシス付のような動作
+            /*
             if (targetLeveldB < stopTh_dB) {
                 stopTh_dB = targetLeveldB;
             }
+            */
         }
 
         //リスタートしたか取得・リセット
