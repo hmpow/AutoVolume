@@ -489,6 +489,7 @@ BOOL CALLBACK MyDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
             //何もしない
             break;
         }
+        break; //バグ修正　忘れていたためトラックバー 下げ クリック時に case WM_COMMAND が引き続いて実行され、wp = 2(IDCANCEL)扱いで閉じてしまった
     }
     case WM_COMMAND:
         switch (LOWORD(wp)) {
