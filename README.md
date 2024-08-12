@@ -9,7 +9,6 @@ EndpointVolume API を用いて、リアルタイムの音声出力レベルを�
 
 <img width="277" alt="image" src="https://github.com/hmpow/AutoVolume/assets/67511807/7ebed174-0d6d-4de0-928a-792404b67626">
 
-
 # Japanese Only
 I can not speak English; therefore, comments and UI texts are available in Japanese only.  
 If I write comments in English, I can no longer read my own code...
@@ -40,6 +39,23 @@ The MIT license does not apply to the quoted code, so please check Microsoft's t
 引用コードにMITライセンスは適用されませんので、使用にあたりましてはMicrosoftの利用規約を確認ください。  
   
 https://learn.microsoft.com/ja-jp/windows/apps/
+
+
+# 自動調整の対象
+
+本ソフトウェアで自動操作している対称の音量をGUIの音量ミキサーで当てはめると、下図になります。
+
+各アプリの音がミックスされたマスター音量(EndpointVolume)を制御対象としています。  
+「耳で聴こえる音量をもとにマウスでタスクバーの音量を操作する」作業を自動で行うイメージです。
+
+既定のデバイス(=Windowsの効果音が鳴るデバイス)を制御対象としますから、アプリで個別の出力先や排他モードを使用している場合は自動調整ができません。
+
+また音量は減衰させるのみで、0dBを超える調整(増幅)はできません。  
+入力音量 < 目標音量　となった際は音量が100% に張り付き自動調整ができません。  
+※ミックスされる前の各アプリ毎の個別音量はMAXにておく必要があります。
+
+![image](https://github.com/user-attachments/assets/1a6fd702-50d0-48f4-91ab-a3efb36711ce)
+
 
 # 詳細 はQiitaをご覧ください
 
